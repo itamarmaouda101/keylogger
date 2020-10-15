@@ -16,13 +16,15 @@ void update_key(struct keyboard_notifier_param p)
     }
     
 }
+/*
 static int device_open(struct indoe *indoe, struct file *file)
 {
     static int counter =0;
     if (Device_open) return -EBUSY;
     device_open++;
 }
-static size_t device_read(struct file *filp, char *buffer, size_t length, __loff_t *offset)
+*/
+static ssize_t device_read(struct file *filp, char __user * buffer, size_t length, loff_t *offset)
 {
     int bytes_read=0;
     if (*msg_Ptr ==0) return 0;

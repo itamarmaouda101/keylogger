@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <strings.h>
+#include <time.h>
 #define DEVICE ""
 
 int main()
@@ -8,7 +9,13 @@ int main()
     char c;
     scanf(%c, c);
     if (c == 'R'){
-        read()
+        int msec=0, trigger=10;/*10ms*/
+        clock_t before = clock();
+        do{
+
+        }
+        clock_t difference = clock()-before;
+        
     }
     return 0;
 }
