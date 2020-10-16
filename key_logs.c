@@ -8,10 +8,10 @@ int main()
 {
     printf("enter R for read the keystrokes");
     char *c, read_buf[100];
-    scanf("%c", c);
+    /*scanf("%c", c);*/
     FILE *fd = fopen(DEVICE, "a+");
     FILE *fd_logs =fopen("/tmp", "a+");
-    if (*c == 'R'){
+    if ('R' == 'R'){
         int msec=0, trigger=1000;/*10ms*10*/
         clock_t before = clock();
         do{

