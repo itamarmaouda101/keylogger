@@ -48,7 +48,7 @@ int device_close(struct inode *inode, struct file *flip)
     up(&virtual_device.sem);
     printk(KERN_INFO "Keylogger: closed device");
     return 0;
-}  
+} 
 static ssize_t device_read(struct file *filp, char __user * buffer, size_t length, loff_t *offset)
 {
     int bytes_read=0;
