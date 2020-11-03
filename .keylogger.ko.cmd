@@ -1,1 +1,0 @@
-cmd_/home/itamar/2/keylogger/keylogger.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000  --build-id  -T ./scripts/module-common.lds -o /home/itamar/2/keylogger/keylogger.ko /home/itamar/2/keylogger/keylogger.o /home/itamar/2/keylogger/keylogger.mod.o;  true
