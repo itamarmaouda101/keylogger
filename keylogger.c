@@ -53,7 +53,7 @@ static int __init MOD_LOAD(void)
         debugfs_remove_recursive(subdir);
         return -ENOENT;
     }
-    file1 = debugfs_create_file("hide",0500, subdir, NULL, &hide);
+    file1 = debugfs_create_file("hide",0500, subdir, NULL, &fops_hide);
     if (!file1)
     {
         debugfs_remove_recursive(subdir);

