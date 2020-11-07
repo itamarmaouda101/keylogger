@@ -18,10 +18,14 @@
 <li><mark>sudo insmod kelogger.ko</mark></li>
 </ol>
 <h2>how to see the keyloging</h2>
-<p>cd /sys/kernel/debug/keylogger</p>
-<p>cat keyloging</p>
+<ol>
+<li>cd /sys/kernel/debug/keylogger</li>
+<li>cat ./keyloging</li>
+</ol>
 <h2>how to hide and unhide the module</h2>
 <p><b>remember that after hiding the module will remove form /proc/modules and will not be recover, im working on fix it</b><p>
-<p>cd /sys/kernel/debug/keylogger</p>
-<p>./hide</p>
+<ol>
+<li>cd /sys/kernel/debug/keylogger</li>
+<li>./hide</li>
+</ol>
 <h3>Tested on Linux ubuntu 5.4.0-52-generic </h3>
