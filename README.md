@@ -5,9 +5,9 @@
 </p>
 <h2>what is it doing?</h2>
 <p>the klm offers the</p>
-- save keystrokes in spesific file 
--hide from lsmod 
-<p>unhide from lsmod </p>
+<p> - save keystrokes in spesific file</p> 
+<p> - hide from lsmod</p> 
+<p> - unhide from lsmod </p>
 <p>cover the tracks by cleaning kernel segments</p>
 <p>remove the module from /sys/modules directory </p>
 <h2>how to use</h2>
