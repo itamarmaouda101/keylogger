@@ -5,7 +5,7 @@
 </p>
 <h2>what is it doing?</h2>
 <p>the klm offers the</p>
-<p>*save keystrokes in spesific file </p>
+<p> * save keystrokes in spesific file </p>
 <p>hide from lsmod </p>
 <p>unhide from lsmod </p>
 <p>cover the tracks by cleaning kernel segments</p>
