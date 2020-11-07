@@ -4,11 +4,11 @@
   that is part of my rootkit project
 </p>
 <h2>what is it doing?</h2>
-<p>- save keystrokes in spesific file</p> 
-<p>- hide from lsmod</p> 
-<p>- unhide from lsmod </p>
-<p>- cover the tracks by cleaning kernel segments</p>
-<p>- remove the module from /sys/modules directory </p>
+<li> save keystrokes in spesific file</li> 
+<li> hide from lsmod</li> 
+<li> unhide from lsmod </li>
+<li> cover the tracks by cleaning kernel segments</li>
+<li> remove the module from /sys/modules directory </li>
 <h2>how to use</h2>
 <p><b>for using the module u need to be super user</b></p>
 <p>clone the repo, using git clone comannd</p>
