@@ -10,7 +10,7 @@
 <p>unhide from lsmod </p>
 <p>cover the tracks by cleaning kernel segments</p>
 <p>remove the module from /sys/modules directory </p>
-<h3>how to use</h3>
+<h2>how to use</h2>
 <p>clone the repo, using git clone comannd</p>
 <p>cd keylogger</p>
 <p>make</p>
