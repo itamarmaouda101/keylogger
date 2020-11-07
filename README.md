@@ -11,11 +11,12 @@
 <p>cover the tracks by cleaning kernel segments</p>
 <p>remove the module from /sys/modules directory </p>
 <h2>how to use</h2>
+<p><b>for using the module u need to be super user</b></p>
 <p>clone the repo, using git clone comannd</p>
 <p>cd keylogger</p>
 <p>make</p>
 <p>sudo insmod kelogger.ko</p>
-<h2>how to see the kyloging</h2>
+<h2>how to see the keyloging</h2>
 <p>cd /sys/kernel/debug/keylogger</p>
 <p>cat keyloging</p>
 <h2>how to hide and unhide the module</h2>
