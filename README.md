@@ -29,3 +29,4 @@
 <li>./hide</li>
 </ol>
 <h3>Tested on Linux ubuntu 5.4.0-52-generic </h3>
+<h4>Note: Don't use this code for illegal activities, it is only meant to teach about rootkits in cyber security education point of view. I am not responsible for any harm to unauthorised system.</h4>
