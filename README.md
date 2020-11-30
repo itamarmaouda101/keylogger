@@ -29,4 +29,8 @@
 <li>./hide</li>
 </ol>
 <h3>Tested on Linux ubuntu 5.4.0-52-generic </h3>
-<h4>Note: Don't use this code for illegal activities, it is only meant to teach about rootkits in cyber security education point of view. I am not responsible for any harm to unauthorised system.</h4>
+<h4>Digital Wishper article about the project</h4>
+<p>during the project i created a little article that discribe my R&D journey</p>
+<p>inside my article im explaining the main idea of the project and how i achieve it 
+this is the link for the article in the digital wishper magazin: https://www.digitalwhisper.co.il/files/Zines/0x7C/DW124-5-LinuxKernelKeyLogger.pdf</p>
+<h5>Note: Don't use this code for illegal activities, it is only meant to teach about rootkits in cyber security education point of view. I am not responsible for any harm to unauthorised system.</h5>
